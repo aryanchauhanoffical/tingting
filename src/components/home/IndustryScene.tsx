@@ -44,8 +44,8 @@ export function IndustryScene({ ind, seed, inView, hovered }: { ind: Industry; s
     .replace(".", "");
 
   return (
-    <div className="relative aspect-[4/3.4] overflow-hidden bg-[#050507]">
-      {/* plain black field: a faint dot grid and a slow beam of white light crossing it */}
+    <div className="scene-wash relative aspect-[4/3.4] overflow-hidden">
+      {/* a light accent wash that fades into the white card below, a dot grid and a slow beam */}
       <div aria-hidden className="scene-grid absolute inset-0" />
       {!reduce && <div aria-hidden className="scene-beam absolute inset-0" />}
 
@@ -54,11 +54,11 @@ export function IndustryScene({ ind, seed, inView, hovered }: { ind: Industry; s
           hovered && !reduce ? "-translate-x-[1%] -translate-y-[2%] rotate-[-3.5deg]" : "rotate-[-4deg]"
         }`}
       >
-        <div className="rounded-[24px] bg-surface p-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)] sm:p-9">
+        <div className="rounded-[24px] bg-surface p-6 shadow-[0_24px_60px_rgb(var(--accent-rgb)/0.18)] ring-1 ring-accent/10 sm:p-9">
           {/* console header */}
           <div className="flex items-center justify-between gap-4 border-b border-line pb-5">
             <div className="flex items-center gap-4">
-              <span className="grid h-11 w-11 place-items-center rounded-full bg-ink font-display text-base sm:h-14 sm:w-14 sm:text-lg font-semibold text-white">
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-accent-2 font-display text-base sm:h-14 sm:w-14 sm:text-lg font-semibold text-accent-ink">
                 {initials}
               </span>
               <div className="leading-tight">
@@ -78,7 +78,7 @@ export function IndustryScene({ ind, seed, inView, hovered }: { ind: Industry; s
               <li key={i} className={`flex ${t.who === "agent" ? "justify-end" : "justify-start"}`}>
                 <p
                   className={`max-w-[78%] rounded-[20px] px-4 py-3 text-base leading-snug sm:px-6 sm:py-4 sm:text-[1.2rem] ${
-                    t.who === "agent" ? "rounded-br-[6px] bg-ink text-white" : "rounded-bl-[6px] bg-ink/[0.05] text-ink"
+                    t.who === "agent" ? "rounded-br-[6px] bg-accent text-accent-contrast" : "rounded-bl-[6px] bg-accent-3 text-ink"
                   }`}
                 >
                   {t.text}
@@ -97,7 +97,7 @@ export function IndustryScene({ ind, seed, inView, hovered }: { ind: Industry; s
                   key={i}
                   suppressHydrationWarning
                   className={`eq-bar w-[4px] origin-center rounded-full transition-colors duration-300 ${
-                    hovered ? "bg-ink" : "bg-ink/25"
+                    hovered ? "bg-accent" : "bg-accent/35"
                   }`}
                   style={{
                     height: `${Math.round(env * 100)}%`,
@@ -114,12 +114,12 @@ export function IndustryScene({ ind, seed, inView, hovered }: { ind: Industry; s
           <div className="mt-4 flex items-center gap-3 sm:mt-5 sm:gap-4">
             <span
               className={`grid h-12 w-12 shrink-0 place-items-center rounded-full transition-colors duration-500 ${
-                done ? "bg-good text-white" : "bg-ink text-white"
+                done ? "bg-good text-white" : "bg-accent-2 text-accent-ink"
               }`}
             >
               {done ? <Check size={22} weight="bold" /> : <Phone size={22} weight="fill" />}
             </span>
-            <p className="min-h-[1.5em] text-base font-medium text-ink sm:text-[1.2rem]">
+            <p className="min-h-[1.5em] text-base font-medium text-accent-ink sm:text-[1.2rem]">
               {typed}
               {!done && <span aria-hidden className="ml-px inline-block h-[1em] w-[2px] translate-y-[0.15em] bg-current" />}
             </p>

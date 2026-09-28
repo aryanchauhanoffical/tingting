@@ -64,13 +64,13 @@ export function WorkflowBuilder() {
                       <motion.span
                         layoutId="feature-bg"
                         aria-hidden
-                        className="absolute inset-0 -z-10 rounded-[16px] bg-ink/[0.04]"
+                        className="absolute inset-0 -z-10 rounded-[16px] bg-accent-3"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
                     <span
                       className={`grid h-11 w-11 shrink-0 place-items-center rounded-[12px] transition-[background-color,color,transform] duration-300 ${
-                        on ? "scale-105 bg-ink text-white shadow-lift" : "bg-ink/[0.05] text-ink group-hover:-rotate-6"
+                        on ? "scale-105 bg-accent text-accent-contrast shadow-accent" : "bg-accent-2 text-accent-ink group-hover:-rotate-6"
                       }`}
                     >
                       <f.icon size={20} weight={on ? "fill" : "bold"} />
@@ -79,11 +79,11 @@ export function WorkflowBuilder() {
                       <span className="block font-medium text-ink">{f.title}</span>
                       <span className="block text-[0.95rem] text-muted">{f.sub}</span>
                       {/* timer bar for the auto-advance */}
-                      <span aria-hidden className="mt-2 block h-[2px] overflow-hidden rounded-full bg-ink/10">
+                      <span aria-hidden className="mt-2 block h-[2px] overflow-hidden rounded-full bg-accent/10">
                         {on && !reduce && (
                           <motion.span
                             key={`${i}-${paused}`}
-                            className="block h-full origin-left bg-ink"
+                            className="block h-full origin-left bg-accent"
                             initial={{ scaleX: paused ? 1 : 0 }}
                             animate={{ scaleX: 1 }}
                             transition={{ duration: paused ? 0 : CYCLE / 1000, ease: "linear" }}
@@ -131,7 +131,8 @@ const CUES = [
 ];
 
 /* the console panel's outline inside the render, so everything around it (the white
-   backdrop, the baked-in glow and cues) is cut away with a hard edge */
+   backdrop, the tinted glow on its borders and the baked-in cues) is cut away with a
+   hard edge; the panel keeps its own colours */
 const PANEL = "polygon(0% 24.2%, 94.2% 14.1%, 97.2% 84.9%, 0% 86.3%)";
 
 function ConsoleShot({ active }: { active: number }) {
@@ -175,7 +176,7 @@ function ConsoleShot({ active }: { active: number }) {
             width={1960}
             height={1890}
             alt="Tring Tring console: a node canvas with Start call, Greeting, a returning-caller condition, Look up order, Human handoff and End call nodes connected in a flow"
-            className="builder-shot block h-auto w-full"
+            className="builder-shot themed-shot block h-auto w-full"
             loading="lazy"
           />
           {!reduce && (
@@ -198,7 +199,7 @@ function ConsoleShot({ active }: { active: number }) {
           <motion.span
             key={c.text}
             aria-hidden
-            className={`absolute hidden items-center gap-2 rounded-[10px] bg-ink px-3.5 py-2 text-sm font-medium text-white shadow-lift sm:inline-flex ${c.pos}`}
+            className={`absolute hidden items-center gap-2 rounded-[10px] bg-surface px-3.5 py-2 text-sm font-medium text-ink shadow-lift ring-1 ring-line sm:inline-flex ${c.pos}`}
             style={{ transform: "translateZ(40px)" }}
             initial={reduce ? false : { opacity: 0, y: 16, scale: 0.9 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -210,7 +211,7 @@ function ConsoleShot({ active }: { active: number }) {
               animate={reduce ? undefined : { y: [0, -5, 0] }}
               transition={{ duration: 4 + i * 0.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
             >
-              <c.icon size={15} weight="bold" />
+              <c.icon size={15} weight="bold" className="text-accent-ink" />
               {c.text}
             </motion.span>
           </motion.span>

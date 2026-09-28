@@ -123,7 +123,7 @@ function CaseCard({ ind, seed, order }: { ind: Industry; seed: number; order: nu
 
       <div className="px-6 pt-8 pb-8 sm:px-8 sm:pt-9 sm:pb-9">
         <p className="inline-flex items-center gap-2.5 text-[0.95rem] font-medium text-muted">
-          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-ink text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-accent-2 text-accent-ink">
             <Icon size={17} weight="bold" />
           </span>
           {ind.name}
