@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { ShieldCheck, Warning, Waveform, TrendUp } from "@phosphor-icons/react";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 
@@ -16,19 +16,17 @@ const CALLS = [
 const METRICS = ["Relevance", "Adherence", "Latency", "Sentiment"];
 
 /**
- * H6 — Call QA & analytics. Headline and a small grader you can poke on the dark
- * field, then the console render straddling the edge: its top half on the dark
- * section with a glowing frame, its bottom half over the light page that follows.
+ * H6 — Call QA & analytics. A dark slab inset from the page edges: headline and a
+ * small grader you can poke, then the console render standing up on a spotlight.
  */
 export function CallQA() {
   return (
-    <section className="relative overflow-x-clip">
-      <div className="relative bg-ink pt-24 text-white sm:pt-32">
-        {/* flow-root keeps the console's negative margin from collapsing through to the section */}
-        <div className="page flow-root">
+    <section className="relative px-2 sm:px-4">
+      <div className="qa-slab relative overflow-hidden rounded-[32px] pb-16 pt-24 text-white sm:rounded-[48px] sm:pb-24 sm:pt-32">
+        <div className="page">
           <div className="grid gap-12 lg:grid-cols-[1.2fr_minmax(0,0.8fr)] lg:items-end lg:gap-16">
             <ScrollReveal className="max-w-3xl">
-              <p className="eyebrow text-accent-soft">
+              <p className="eyebrow on-ink">
                 Call QA &amp; analytics
               </p>
               <h2 className="font-display mt-3 text-display font-semibold">Every call is graded before you ever hear it.</h2>
@@ -38,17 +36,11 @@ export function CallQA() {
             </ScrollReveal>
           </div>
 
-          {/* pulls the dark field up to its own middle: half of its 2000x1128 height, from its width */}
-          <div className="relative mx-auto mt-8 w-full max-w-[1120px] mb-[calc(min(1120px,100%)*-0.282)] sm:mt-10">
+          <div className="relative mx-auto mt-14 w-full max-w-[1120px] sm:mt-20">
             <ConsoleShot />
             <Signals />
           </div>
         </div>
-      </div>
-
-      {/* room on the light page for the half of the console that hangs below the dark field */}
-      <div className="page">
-        <div aria-hidden className="mx-auto w-full max-w-[1120px] aspect-[2000/564]" />
       </div>
     </section>
   );
@@ -115,28 +107,39 @@ function Grader() {
   );
 }
 
-/** The render, inside a frame that glows on its lower half. */
+/**
+ * The render on a spotlight. It starts tipped back on its pedestal and stands up as it
+ * scrolls into view; a slow light sweep crosses the glass once it is there.
+ */
 function ConsoleShot() {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
+  const p = useSpring(scrollYProgress, { stiffness: 80, damping: 22, restDelta: 0.001 });
+  const rotateX = useTransform(p, [0, 1], [28, 0]);
+  const scale = useTransform(p, [0, 1], [0.86, 1]);
+  const y = useTransform(p, [0, 1], [60, 0]);
+  const glow = useTransform(p, [0.3, 1], [0, 1]);
 
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-120px" }}
-      transition={{ duration: 1, ease: EASE }}
-      className="console-glow relative rounded-[24px]"
-    >
-      <div aria-hidden className="glow-layer" />
-      <img
-        src="/generated/qa-console.webp"
-        width={2000}
-        height={1128}
-        alt="Tring Tring event console for Mehta Sangeet Night: calls made, calls received, RSVP yes and live now up top, event activity over the evening, the RSVP, reminder, directions, feedback and helpline campaigns, and call outcomes, with a live customer call and transcript on either side"
-        className="themed-shot relative block h-auto w-full rounded-[24px]"
-        loading="lazy"
-      />
-    </motion.div>
+    <div ref={ref} className="relative [perspective:1600px]">
+      <motion.div aria-hidden style={reduce ? undefined : { opacity: glow }} className="qa-spot absolute inset-x-[5%] bottom-[-8%] top-[20%]" />
+      <motion.div
+        style={reduce ? undefined : { rotateX, scale, y, transformOrigin: "50% 100%" }}
+        className="relative"
+      >
+        <img
+          src="/generated/qa-console.webp"
+          width={2000}
+          height={1128}
+          alt="Tring Tring event console for Mehta Sangeet Night: calls made, calls received, RSVP yes and live now up top, event activity over the evening, the RSVP, reminder, directions, feedback and helpline campaigns, and call outcomes, with a live customer call and transcript on either side"
+          className="qa-shot themed-shot relative block h-auto w-full"
+          loading="lazy"
+        />
+        {!reduce && <div aria-hidden className="qa-sweep qa-shot pointer-events-none absolute inset-0" />}
+      </motion.div>
+      <motion.div aria-hidden style={reduce ? undefined : { opacity: glow }} className="qa-floor absolute inset-x-[12%] bottom-[3%] h-px" />
+    </div>
   );
 }
 

@@ -44,16 +44,17 @@ export function IndustryScene({ ind, seed, inView, hovered }: { ind: Industry; s
     .replace(".", "");
 
   return (
-    <div className="relative aspect-[4/3.4] overflow-hidden bg-[#111118]">
-      {/* one flat diagonal plane in the accent, so the dark field has a shape instead of a glow */}
-      <div aria-hidden className="absolute inset-0 bg-accent/[0.22] [clip-path:polygon(0_0,62%_0,26%_100%,0_100%)]" />
+    <div className="scene-wash relative aspect-[4/3.4] overflow-hidden">
+      {/* a light accent wash that fades into the white card below, a dot grid and a slow beam */}
+      <div aria-hidden className="scene-grid absolute inset-0" />
+      {!reduce && <div aria-hidden className="scene-beam absolute inset-0" />}
 
       <div
         className={`absolute top-[14%] left-[9%] w-[128%] origin-top-left transition-transform duration-[900ms] ease-[var(--ease-signal)] ${
           hovered && !reduce ? "-translate-x-[1%] -translate-y-[2%] rotate-[-3.5deg]" : "rotate-[-4deg]"
         }`}
       >
-        <div className="rounded-[24px] bg-surface p-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)] sm:p-9">
+        <div className="rounded-[24px] bg-surface p-6 shadow-[0_24px_60px_rgb(var(--accent-rgb)/0.18)] ring-1 ring-accent/10 sm:p-9">
           {/* console header */}
           <div className="flex items-center justify-between gap-4 border-b border-line pb-5">
             <div className="flex items-center gap-4">
@@ -77,7 +78,7 @@ export function IndustryScene({ ind, seed, inView, hovered }: { ind: Industry; s
               <li key={i} className={`flex ${t.who === "agent" ? "justify-end" : "justify-start"}`}>
                 <p
                   className={`max-w-[78%] rounded-[20px] px-4 py-3 text-base leading-snug sm:px-6 sm:py-4 sm:text-[1.2rem] ${
-                    t.who === "agent" ? "rounded-br-[6px] bg-accent text-accent-contrast" : "rounded-bl-[6px] bg-bg text-ink"
+                    t.who === "agent" ? "rounded-br-[6px] bg-accent text-accent-contrast" : "rounded-bl-[6px] bg-accent-3 text-ink"
                   }`}
                 >
                   {t.text}

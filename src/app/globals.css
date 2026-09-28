@@ -400,34 +400,39 @@ html[data-intro] .theme-bar {
   }
 }
 
-/* QA console: a glowing frame on the lower half only, where the black render hangs
-   over the light page. The glow lives on an oversized layer behind the render, masked
-   so it fades in through the render's midline; the hairline ring is on the layer too. */
-.console-glow > .glow-layer {
-  position: absolute;
-  inset: -180px;
-  pointer-events: none;
-  mask-image: linear-gradient(to bottom, transparent calc(50% + 10px), #000 calc(50% + 110px));
-  -webkit-mask-image: linear-gradient(to bottom, transparent calc(50% + 10px), #000 calc(50% + 110px));
+/* QA console: sits on a spotlight inside the dark slab. The render's own black backdrop
+   is faded out at the edges so it melts into the slab instead of reading as a box. */
+.qa-slab {
+  background:
+    radial-gradient(60% 45% at 50% 100%, rgb(var(--accent-rgb) / 0.28), transparent 70%),
+    radial-gradient(40% 30% at 50% 0%, rgb(255 255 255 / 0.05), transparent 70%),
+    #000;
 }
-.console-glow > .glow-layer::before {
-  content: "";
-  position: absolute;
-  inset: 180px;
-  border-radius: 24px;
-  box-shadow:
-    0 0 0 1.5px rgb(var(--accent-rgb, 233 0 0) / 0.55),
-    0 0 24px rgb(var(--accent-rgb, 233 0 0) / 0.22),
-    0 0 60px rgb(var(--accent-rgb, 233 0 0) / 0.12),
-    0 30px 80px rgba(11, 11, 15, 0.35);
-  transition: box-shadow 0.6s var(--ease-signal);
+.qa-spot {
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.35), rgb(var(--accent-rgb) / 0.08) 55%, transparent);
+  filter: blur(20px);
 }
-.console-glow:hover > .glow-layer::before {
-  box-shadow:
-    0 0 0 1.5px rgb(var(--accent-rgb, 233 0 0) / 0.8),
-    0 0 32px rgb(var(--accent-rgb, 233 0 0) / 0.32),
-    0 0 80px rgb(var(--accent-rgb, 233 0 0) / 0.18),
-    0 30px 80px rgba(11, 11, 15, 0.35);
+.qa-floor {
+  background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.9), transparent);
+  box-shadow: 0 0 24px 4px rgb(var(--accent-rgb) / 0.45);
+}
+.qa-shot {
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent),
+    linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent),
+    linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+.qa-sweep {
+  background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.08) 48%, rgb(var(--accent-rgb) / 0.12) 52%, transparent 65%);
+  background-size: 250% 100%;
+  animation: sweep 7s var(--ease-signal) infinite;
+  mix-blend-mode: screen;
+}
+@keyframes sweep {
+  0% { background-position: 120% 0; }
+  60%, 100% { background-position: -120% 0; }
 }
 
 /* Live readouts around the QA console: solid dark chips with a coloured hairline and a
@@ -463,16 +468,91 @@ html[data-intro] .theme-bar {
   transition: filter 420ms var(--ease-signal);
 }
 
-/* Console render: its white backdrop fades into the page on the top, right and bottom edges.
-   The left edge stays almost hard so the panel's sidebar is not washed out. */
-.console-shot {
-  --fade: 56px;
-  mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - var(--fade)), transparent),
-    linear-gradient(to bottom, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - var(--fade)), transparent),
-    linear-gradient(to bottom, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
+/* Builder render: clipped to the console panel (no tinted border), in its own colours,
+   with a light line that scans down it now and then. */
+.builder-panel {
+  filter: drop-shadow(0 30px 50px rgb(11 11 15 / 0.35));
+}
+.builder-scan {
+  background: linear-gradient(180deg, transparent 0%, rgb(255 255 255 / 0.07) 48%, rgb(255 255 255 / 0.16) 50%, transparent 52%);
+  background-size: 100% 250%;
+  animation: scan 6s var(--ease-signal) infinite;
+}
+@keyframes scan {
+  0% { background-position: 0 120%; }
+  55%, 100% { background-position: 0 -120%; }
+}
+.hotspot {
+  border: 1.5px solid var(--color-accent);
+  box-shadow: 0 0 0 4px rgb(var(--accent-rgb) / 0.15), 0 0 26px rgb(var(--accent-rgb) / 0.5);
+}
+.hotspot::after {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  border: 1.5px solid var(--color-accent);
+  animation: hotspot-ping 1.8s var(--ease-signal) infinite;
+}
+@keyframes hotspot-ping {
+  from { transform: scale(1); opacity: 0.8; }
+  to { transform: scale(1.25, 1.6); opacity: 0; }
+}
+
+/* ============================================================
+   Inbound / outbound switchboard
+   ============================================================ */
+.switchboard {
+  --gx: 20%;
+  background: radial-gradient(120% 90% at 50% 120%, rgb(var(--accent-rgb) / 0.14), transparent 60%), #0b0b0f;
+}
+.switchboard-grid {
+  background: radial-gradient(rgb(255 255 255 / 0.13) 1px, transparent 1.2px) 0 0 / 20px 20px;
+  mask-image: radial-gradient(50% 70% at var(--gx) 50%, #000, transparent 100%);
+  -webkit-mask-image: radial-gradient(50% 70% at var(--gx) 50%, #000, transparent 100%);
+}
+.switchboard-halo {
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.3), rgb(var(--accent-rgb) / 0.06) 55%, transparent);
+}
+.switchboard-word {
+  font-size: clamp(4rem, 13vw, 11rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.07);
+}
+.switchboard-aura {
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.22), transparent);
+  filter: blur(30px);
+}
+.agent-orb {
+  background: radial-gradient(circle at 35% 30%, rgb(var(--accent-soft-rgb) / 0.9), var(--color-accent) 45%, rgb(var(--accent-rgb) / 0.55) 100%);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.15) inset, 0 0 40px rgb(var(--accent-rgb) / 0.6), 0 0 90px rgb(var(--accent-rgb) / 0.3);
+}
+.contact-card {
+  background: rgb(255 255 255 / 0.03);
+  border-color: rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(6px);
+  transition: border-color 0.35s var(--ease-signal), background 0.35s var(--ease-signal), box-shadow 0.35s var(--ease-signal), transform 0.35s var(--ease-signal);
+}
+.contact-on {
+  background: rgb(var(--accent-rgb) / 0.12);
+  border-color: rgb(var(--accent-rgb) / 0.7);
+  box-shadow: 0 0 0 1px rgb(var(--accent-rgb) / 0.25), 0 0 28px rgb(var(--accent-rgb) / 0.35);
+  transform: scale(1.04);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin-slow { transform-origin: 50% 50%; animation: spin 14s linear infinite; }
+.spin-slow-rev { transform-origin: 50% 50%; animation: spin 20s linear infinite reverse; }
+@keyframes ripple-out {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+}
+@keyframes ripple-in {
+  0% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+  30% { opacity: 0.5; }
+  100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
 }
 
 /* Intro: the hero sets data-intro on <html> until the first click; the nav waits with it */
@@ -561,4 +641,88 @@ html[data-intro] body {
 /* The navbar sits under the preview bar rather than behind it. */
 .site-header {
   top: var(--preview-bar, 0px);
+}
+
+@keyframes ring-ping {
+  from { transform: scale(1); opacity: 0.8; }
+  to { transform: scale(1.6); opacity: 0; }
+}
+
+/* Industry scenes: a soft accent wash that runs out into the white card body, so the
+   scene and the copy under it read as one surface. Dot grid and a slow light beam on top. */
+.scene-wash {
+  background:
+    radial-gradient(80% 70% at 15% 10%, rgb(var(--accent-rgb) / 0.16), transparent 70%),
+    radial-gradient(60% 60% at 95% 30%, rgb(var(--accent-soft-rgb) / 0.22), transparent 70%),
+    linear-gradient(to bottom, var(--color-accent-3), var(--color-surface));
+}
+.scene-grid {
+  background: radial-gradient(rgb(var(--accent-rgb) / 0.2) 1px, transparent 1.2px) 0 0 / 18px 18px;
+  mask-image: linear-gradient(160deg, #000 20%, transparent 85%);
+  -webkit-mask-image: linear-gradient(160deg, #000 20%, transparent 85%);
+}
+.scene-beam {
+  background: linear-gradient(115deg, transparent 40%, rgb(255 255 255 / 0.55) 50%, transparent 60%);
+  background-size: 300% 100%;
+  animation: beam 9s ease-in-out infinite;
+}
+@keyframes beam {
+  0% { background-position: 100% 0; }
+  60%, 100% { background-position: 0% 0; }
+}
+
+/* ============================================================
+   Commitments: black room, one red stage
+   ============================================================ */
+.commit-bg {
+  background:
+    radial-gradient(50% 60% at 25% 60%, rgb(var(--accent-rgb) / 0.14), transparent 70%),
+    #07070a;
+}
+.commit-stage {
+  background:
+    radial-gradient(70% 60% at 50% 55%, rgb(var(--accent-rgb) / 0.95), rgb(var(--accent-rgb) / 0.45) 45%, #1a0304 90%),
+    #1a0304;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.06) inset, 0 30px 90px rgb(var(--accent-rgb) / 0.3);
+}
+.commit-dots {
+  background: radial-gradient(rgb(255 255 255 / 0.22) 1px, transparent 1.3px) 0 0 / 16px 16px;
+  mask-image: radial-gradient(50% 60% at 20% 40%, #000, transparent 80%);
+  -webkit-mask-image: radial-gradient(50% 60% at 20% 40%, #000, transparent 80%);
+}
+.commit-floor {
+  background: linear-gradient(to top, rgb(0 0 0 / 0.45), transparent);
+}
+.commit-chip {
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0.05));
+  border: 1px solid rgb(255 255 255 / 0.25);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.commit-phone {
+  background: linear-gradient(145deg, rgb(var(--accent-soft-rgb)), var(--color-accent) 40%, rgb(var(--accent-rgb) / 0.7));
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25) inset, 0 0 50px rgb(var(--accent-rgb) / 0.8), 0 40px 60px rgb(0 0 0 / 0.5);
+}
+.commit-core {
+  background: radial-gradient(circle at 35% 30%, #2a0507, #080305 70%);
+  border: 1.5px solid rgb(var(--accent-rgb) / 0.9);
+  box-shadow: 0 0 40px rgb(var(--accent-rgb) / 0.7), inset 0 0 30px rgb(var(--accent-rgb) / 0.35);
+}
+.commit-head {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.035em;
+}
+.commit-arrow {
+  border: 1.5px solid rgb(var(--accent-rgb) / 0.7);
+  background: rgb(0 0 0 / 0.3);
+  box-shadow: 0 0 24px rgb(var(--accent-rgb) / 0.25);
+  transition: box-shadow 0.3s var(--ease-signal), transform 0.3s var(--ease-signal), background 0.3s var(--ease-signal);
+}
+.commit-arrow:hover {
+  background: var(--color-accent);
+  box-shadow: 0 0 40px rgb(var(--accent-rgb) / 0.6);
+  transform: translateY(-50%) scale(1.08);
 }
