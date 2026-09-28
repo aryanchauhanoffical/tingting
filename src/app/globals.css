@@ -1,0 +1,564 @@
+@import "tailwindcss";
+/* Tooling output, not class-name sources. Without this every Playwright screenshot or log
+   written into the project retriggers a CSS rebuild and a page refresh in dev. */
+@source not "../../.playwright-mcp";
+
+/* ============================================================
+   Tring Tring — Design System (§0 content.md)
+   "Clinical-luxury telecom": warm off-white canvas, one signal
+   accent, huge editorial type, sound made visible.
+   Single LIGHT theme, locked (brief mandate).
+   ============================================================ */
+
+@theme {
+  /* --- Color ---------------------------------------------- */
+  --color-bg: #ffffff; /* pure white — crisper against the brand red than an off-white */
+  --color-surface: #ffffff; /* cards on --bg */
+  --color-ink: #0b0b0f; /* near-black text */
+  --color-muted: #6b6b76;
+  --color-faint: #9a9aa4;
+  --color-line: #e7e7e2; /* hairlines */
+  --color-line-soft: #f0f0ec;
+
+  /* The accent set is re-pointed at runtime by the preview bar (src/lib/theme.ts),
+     which is why every one of these reads from a variable instead of a literal.
+     Fallbacks below are the brand red (deriveTheme("#e90000") in src/lib/theme.ts),
+     so the page renders correctly before the boot script runs and with JS disabled. */
+  --color-accent: var(--accent, #e90000); /* Tring Red — voice/signal */
+  --color-accent-ink: var(--accent-ink, #d00000); /* accent for text on light (AA safe) */
+  --color-accent-2: var(--accent-2, #ffe0db); /* soft complementary wash */
+  --color-accent-3: var(--accent-3, #fff0ed);
+  --color-accent-soft: var(--accent-soft, #f99080); /* accent tint on the ink sections */
+  --color-accent-contrast: var(--accent-contrast, #ffffff); /* text that sits on the accent */
+  --color-support: var(--support, #00c6aa); /* partner hue, second-tier signals on ink */
+  /* Fixed, not theme-derived: a pass/fail verdict should never invert its meaning
+     because the brand colour happens to be red. Contrast-checked at 5.5:1 on white
+     and on itself (white icon on a solid fill), so it works as text or as a badge. */
+  --color-good: #047857;
+
+  /* Fixed, not theme-derived: a small supporting pair for sections that need more
+     than one hue (e.g. the commitments carousel). Red stays dominant — these are
+     used for at most one slide/accent each, never as the section's main colour.
+     Navy is the classic trust pairing for red; terracotta is red's warm neighbour.
+     Both clear 4.8:1 on white and take a white icon at full fill. */
+  --color-navy: #1e3a5f;
+  --color-terracotta: #b8541e;
+
+  /* --- Radii ---------------------------------------------- */
+  --radius-card: 20px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  /* --- Type ----------------------------------------------- */
+  --font-display: var(--font-space-grotesk), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+
+  /* --- Motion --------------------------------------------- */
+  --ease-signal: cubic-bezier(0.21, 0.47, 0.32, 0.98);
+
+  /* --- Layout --------------------------------------------- */
+  --container-page: 1400px;
+}
+
+/* Layered, low-opacity shadows — tinted to the warm bg, never harsh black */
+@theme {
+  --shadow-soft: 0 1px 2px rgba(11, 11, 15, 0.04), 0 8px 24px rgba(11, 11, 15, 0.05);
+  --shadow-lift: 0 2px 4px rgba(11, 11, 15, 0.04), 0 18px 40px rgba(11, 11, 15, 0.08);
+  --shadow-float: 0 8px 16px rgba(11, 11, 15, 0.06), 0 30px 80px rgba(43, 43, 90, 0.12);
+  --shadow-accent: 0 10px 40px rgb(var(--accent-rgb, 233 0 0) / 0.18);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+:root {
+  color-scheme: light;
+  /* Defaults the preview bar overwrites. Kept here so the site renders correctly
+     with JavaScript disabled and before the theme script runs. Brand red. */
+  --accent-rgb: 233 0 0;
+  --accent-soft-rgb: 249 144 128;
+  --support-rgb: 0 198 170;
+  --shot-filter: hue-rotate(100deg) saturate(0.56);
+  --preview-bar: 44px;
+  /* how long an accent swap takes to settle, so the page shifts rather than snaps */
+  --accent-ease: 420ms var(--ease-signal);
+}
+
+
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+/* Display type defaults */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+
+/* Fluid hero display scale (§0) — sized so a 2-line headline fits a ~50% column */
+.text-hero {
+  font-size: clamp(2.5rem, 4.7vw, 4rem);
+  line-height: 1.0;
+  letter-spacing: -0.035em;
+}
+/* Hero headline: three rows in the left column, "Your calls," / "handled." / "In <language>." */
+.text-mega {
+  font-size: clamp(2.75rem, 6vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+.text-display {
+  font-size: clamp(2.5rem, 5.2vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.text-title {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+/* Eyebrow (rationed — max 1 per 3 sections) */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent-ink);
+}
+
+/* Same eyebrow on the ink sections, where the dark accent would not read.
+   Written here rather than as a Tailwind class because .eyebrow sets the colour and
+   would otherwise win on source order. */
+.eyebrow.on-ink {
+  color: var(--color-accent-soft);
+}
+
+/* Technical / signal numerals */
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ============================================================
+   Signature surfaces
+   ============================================================ */
+
+/* Navbar: frosted glass (owner's call, overriding the house rule against glass for this
+   one surface). Kept fairly opaque so the links stay readable over the dark sections. */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), var(--shadow-soft);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Menus stay solid: the Solutions panel opens over the dark QA section and has to read. */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-lift);
+}
+
+/* Sticker: hard-edged chip with an offset ink shadow. Lifts on hover, sinks on press. */
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: 3px 3px 0 var(--color-ink);
+  letter-spacing: -0.01em;
+  user-select: none;
+  touch-action: manipulation;
+  transition: box-shadow 0.18s var(--ease-signal), background 0.18s var(--ease-signal), color 0.18s var(--ease-signal);
+}
+.sticker:hover {
+  box-shadow: 6px 6px 0 var(--color-ink);
+}
+.sticker:active {
+  box-shadow: 1px 1px 0 var(--color-ink);
+}
+.sticker:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.sticker-on {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+/* Greeting stickers: a wrapping row by default, a ring around the orb on wide pointer screens.
+   CSS owns the spot and the centering, so the layout is right before hydration and the
+   sticker's own transform stays free for drag. --ox / --oy come from Hero's orbitSpot(). */
+.orbit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+@media (min-width: 1200px) and (pointer: fine) {
+  .orbit {
+    display: block;
+    position: absolute;
+    inset-inline: 0;
+    top: 1.5rem;
+    z-index: 10;
+    height: 0;
+    margin: 0;
+  }
+  .orbit-spot {
+    position: absolute;
+    left: var(--ox);
+    top: var(--oy);
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Pipeline stage card. The accent states live here rather than in Motion, because
+   Motion cannot tween a colour that is itself a custom property. */
+.stage-card {
+  border-color: var(--color-line);
+  transition: border-color 400ms var(--ease-signal);
+}
+.stage-card[data-active] {
+  border-color: rgb(var(--accent-rgb) / 0.5);
+}
+.stage-icon {
+  background: var(--color-accent-2);
+  color: var(--color-accent-ink);
+  transition: background-color 400ms var(--ease-signal), color 400ms var(--ease-signal);
+}
+.stage-card[data-active] .stage-icon {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+/* ============================================================
+   Accent preview bar (client tool, not site chrome)
+   ============================================================ */
+.theme-bar {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 60;
+  background: #08080c;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+}
+/* The bar holds the same intro silence as the navbar: during the hero intro only the
+   orb is on screen, so the tool fades in with everything else. */
+.theme-bar {
+  transition: opacity 2.6s var(--ease-signal) 1s;
+}
+html[data-intro] .theme-bar {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+
+.theme-dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 22px;
+  width: 22px;
+  flex: none;
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+  transition: transform 0.18s var(--ease-signal), box-shadow 0.18s var(--ease-signal);
+}
+.theme-dot:hover {
+  transform: translateY(-1px) scale(1.08);
+}
+.theme-dot[aria-checked="true"] {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25), 0 0 0 2px #08080c, 0 0 0 3.5px currentColor;
+  color: #fff;
+}
+.theme-dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.theme-custom,
+.theme-hex,
+.theme-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: none;
+  height: 26px;
+  padding-inline: 0.55rem;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: rgb(255 255 255 / 0.7);
+  background: rgb(255 255 255 / 0.07);
+  cursor: pointer;
+  transition: background 0.18s var(--ease-signal), color 0.18s var(--ease-signal), box-shadow 0.18s var(--ease-signal);
+}
+.theme-custom:hover,
+.theme-reset:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+}
+.theme-reset:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.theme-custom:focus-within,
+.theme-reset:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Typed hex entry: a "#" glyph the eye reads as a prefix, then a small mono field.
+   Both live in the same pill so the control reads as one thing, not two. */
+.theme-hex {
+  gap: 0.1rem;
+  cursor: text;
+  color: rgb(255 255 255 / 0.35);
+  font-family: var(--font-mono);
+}
+.theme-hex:focus-within {
+  background: rgb(255 255 255 / 0.14);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+.theme-hex input {
+  width: 6.4ch;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #fff;
+  font: inherit;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.theme-hex input:focus {
+  outline: none;
+}
+.theme-hex input::placeholder {
+  color: rgb(255 255 255 / 0.3);
+  text-transform: none;
+}
+/* the native colour input is the hit area, kept invisible over the label */
+.theme-custom input[type="color"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.theme-custom {
+  position: relative;
+}
+
+/* Colour changes settle rather than snap, on the properties that carry the accent. */
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  button,
+  .sticker,
+  .signal,
+  [class*="bg-accent"],
+  [class*="text-accent"],
+  [class*="border-accent"] {
+    transition-property: color, background-color, border-color, box-shadow, fill, stroke;
+    transition-duration: 420ms;
+    transition-timing-function: var(--ease-signal);
+  }
+}
+
+/* QA console: a glowing frame on the lower half only, where the black render hangs
+   over the light page. The glow lives on an oversized layer behind the render, masked
+   so it fades in through the render's midline; the hairline ring is on the layer too. */
+.console-glow > .glow-layer {
+  position: absolute;
+  inset: -180px;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent calc(50% + 10px), #000 calc(50% + 110px));
+  -webkit-mask-image: linear-gradient(to bottom, transparent calc(50% + 10px), #000 calc(50% + 110px));
+}
+.console-glow > .glow-layer::before {
+  content: "";
+  position: absolute;
+  inset: 180px;
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1.5px rgb(var(--accent-rgb, 233 0 0) / 0.55),
+    0 0 24px rgb(var(--accent-rgb, 233 0 0) / 0.22),
+    0 0 60px rgb(var(--accent-rgb, 233 0 0) / 0.12),
+    0 30px 80px rgba(11, 11, 15, 0.35);
+  transition: box-shadow 0.6s var(--ease-signal);
+}
+.console-glow:hover > .glow-layer::before {
+  box-shadow:
+    0 0 0 1.5px rgb(var(--accent-rgb, 233 0 0) / 0.8),
+    0 0 32px rgb(var(--accent-rgb, 233 0 0) / 0.32),
+    0 0 80px rgb(var(--accent-rgb, 233 0 0) / 0.18),
+    0 30px 80px rgba(11, 11, 15, 0.35);
+}
+
+/* Live readouts around the QA console: solid dark chips with a coloured hairline and a
+   soft glow in the same colour. Two tones only, the accent and green for "good". */
+.signal {
+  border-radius: 10px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #fff;
+  background: #15151f;
+  white-space: nowrap;
+  transition: box-shadow 0.3s var(--ease-signal);
+}
+.signal-accent {
+  box-shadow: 0 0 0 1px rgb(var(--accent-rgb, 233 0 0) / 0.7), 0 0 22px rgb(var(--accent-rgb, 233 0 0) / 0.35), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.signal-accent:hover {
+  box-shadow: 0 0 0 1px rgb(var(--accent-rgb, 233 0 0) / 1), 0 0 34px rgb(var(--accent-rgb, 233 0 0) / 0.6), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.signal-support {
+  box-shadow: 0 0 0 1px rgb(var(--support-rgb) / 0.7), 0 0 22px rgb(var(--support-rgb) / 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.signal-support:hover {
+  box-shadow: 0 0 0 1px rgb(var(--support-rgb) / 1), 0 0 34px rgb(var(--support-rgb) / 0.55), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* The two product renders have the old indigo baked into their pixels, so the theme
+   shifts them with a filter instead. Not colour-accurate, but it stops them sitting
+   stubbornly purple next to a green or an orange page. */
+.themed-shot {
+  filter: var(--shot-filter, none);
+  transition: filter 420ms var(--ease-signal);
+}
+
+/* Console render: its white backdrop fades into the page on the top, right and bottom edges.
+   The left edge stays almost hard so the panel's sidebar is not washed out. */
+.console-shot {
+  --fade: 56px;
+  mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - var(--fade)), transparent),
+    linear-gradient(to bottom, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - var(--fade)), transparent),
+    linear-gradient(to bottom, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* Intro: the hero sets data-intro on <html> until the first click; the nav waits with it */
+header {
+  transition: opacity 2.6s var(--ease-signal) 1s;
+}
+html[data-intro] header {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+/* no scrolling until the intro has been dismissed */
+html[data-intro],
+html[data-intro] body {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Hairline utility (group without cards) */
+.rule {
+  border-top: 1px solid var(--color-line);
+}
+
+/* Container */
+.page {
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+/* ============================================================
+   Motion primitives / keyframes
+   ============================================================ */
+/* CSS entrance (no JS dependency — content stays visible if hydration fails) */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(0.5em); }
+  to { opacity: 1; transform: none; }
+}
+.rise {
+  animation: rise 0.7s var(--ease-signal) both;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.55; }
+}
+.pulse-dot {
+  animation: pulse-dot 1s var(--ease-signal) infinite; /* ~60bpm */
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes eq {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.eq-bar {
+  animation: eq 1.25s ease-in-out infinite;
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.4); opacity: 0.5; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Reduced motion — collapse everything to static (§6.B) */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .pulse-dot,
+  .marquee-track { animation: none !important; }
+}
+
+/* The navbar sits under the preview bar rather than behind it. */
+.site-header {
+  top: var(--preview-bar, 0px);
+}
