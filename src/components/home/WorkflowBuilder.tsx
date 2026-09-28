@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform, useReducedMotion } from "motion/react";
-import { ArrowRight, ChartBar, Check, Lightning, Play, Sparkle, UploadSimple } from "@phosphor-icons/react";
+import { ArrowRight, ChartBar, Check, CloudArrowUp, HandGrabbing, Lightning, Play, Sparkle, UploadSimple } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/Button";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 
@@ -10,14 +10,14 @@ import { ScrollReveal } from "@/components/motion/ScrollReveal";
 const FEATURES = [
   { icon: Sparkle, title: "No-code canvas", sub: "Design complex call flows visually.", spot: [41.5, 53.2, 20, 8.2] },
   { icon: UploadSimple, title: "Pre-built nodes", sub: "Greetings, logic, tools, handoff and more.", spot: [7.2, 34.6, 19.5, 50.5] },
-  { icon: Lightning, title: "Test in real time", sub: "Try, iterate, and go live in minutes.", spot: [71.8, 3.8, 22.8, 9.8] },
-  { icon: ChartBar, title: "Built for scale", sub: "Production-ready for high call volumes.", spot: [75.6, 22.8, 14.8, 6.8] },
+  { icon: Lightning, title: "Test in real time", sub: "Try, iterate, and go live in minutes.", spot: [47.2, 26.8, 7, 4.4] },
+  { icon: ChartBar, title: "Built for scale", sub: "Production-ready for high call volumes.", spot: [75.8, 23, 14.4, 6.2] },
 ];
 const CYCLE = 3200;
 
 /**
- * H7 — Visual agent builder. Copy on the left, the console render on the right on a
- * tinted stage. The feature list walks itself and lights the matching part of the
+ * H7 — Visual agent builder. Copy on the left, the console render on the right, cut to
+ * the panel's own hard edge. The feature list walks itself and lights the matching part of the
  * render; the render tilts toward the pointer with a glare that follows it.
  */
 export function WorkflowBuilder() {
@@ -64,13 +64,13 @@ export function WorkflowBuilder() {
                       <motion.span
                         layoutId="feature-bg"
                         aria-hidden
-                        className="absolute inset-0 -z-10 rounded-[16px] bg-accent-3"
+                        className="absolute inset-0 -z-10 rounded-[16px] bg-ink/[0.04]"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
                     <span
                       className={`grid h-11 w-11 shrink-0 place-items-center rounded-[12px] transition-[background-color,color,transform] duration-300 ${
-                        on ? "scale-105 bg-accent text-accent-contrast shadow-accent" : "bg-accent-2 text-accent-ink group-hover:-rotate-6"
+                        on ? "scale-105 bg-ink text-white shadow-lift" : "bg-ink/[0.05] text-ink group-hover:-rotate-6"
                       }`}
                     >
                       <f.icon size={20} weight={on ? "fill" : "bold"} />
@@ -79,11 +79,11 @@ export function WorkflowBuilder() {
                       <span className="block font-medium text-ink">{f.title}</span>
                       <span className="block text-[0.95rem] text-muted">{f.sub}</span>
                       {/* timer bar for the auto-advance */}
-                      <span aria-hidden className="mt-2 block h-[2px] overflow-hidden rounded-full bg-accent/10">
+                      <span aria-hidden className="mt-2 block h-[2px] overflow-hidden rounded-full bg-ink/10">
                         {on && !reduce && (
                           <motion.span
                             key={`${i}-${paused}`}
-                            className="block h-full origin-left bg-accent"
+                            className="block h-full origin-left bg-ink"
                             initial={{ scaleX: paused ? 1 : 0 }}
                             animate={{ scaleX: 1 }}
                             transition={{ duration: paused ? 0 : CYCLE / 1000, ease: "linear" }}
@@ -123,16 +123,27 @@ export function WorkflowBuilder() {
   );
 }
 
+/* hand-off cues around the console, as real chips rather than the ones baked into the render */
+const CUES = [
+  { icon: HandGrabbing, text: "Drag & connect", pos: "left-[16%] top-[6%]" },
+  { icon: Play, text: "Test in real time", pos: "right-[4%] top-[1%]" },
+  { icon: CloudArrowUp, text: "Publish instantly", pos: "bottom-[4%] right-[8%]" },
+];
+
+/* the console panel's outline inside the render, so everything around it (the white
+   backdrop, the baked-in glow and cues) is cut away with a hard edge */
+const PANEL = "polygon(0% 24.2%, 94.2% 14.1%, 97.2% 84.9%, 0% 86.3%)";
+
 function ConsoleShot({ active }: { active: number }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-7, 7]), { stiffness: 90, damping: 20 });
-  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [6, -6]), { stiffness: 90, damping: 20 });
-  const glareX = useTransform(mx, [-0.5, 0.5], ["20%", "80%"]);
-  const glareY = useTransform(my, [-0.5, 0.5], ["20%", "80%"]);
-  const glare = useMotionTemplate`radial-gradient(40% 40% at ${glareX} ${glareY}, rgb(255 255 255 / 0.35), transparent 70%)`;
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-8, 8]), { stiffness: 90, damping: 20 });
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [7, -7]), { stiffness: 90, damping: 20 });
+  const glareX = useTransform(mx, [-0.5, 0.5], ["15%", "85%"]);
+  const glareY = useTransform(my, [-0.5, 0.5], ["15%", "85%"]);
+  const glare = useMotionTemplate`radial-gradient(35% 35% at ${glareX} ${glareY}, rgb(255 255 255 / 0.14), transparent 70%)`;
   const [l, t, w, h] = FEATURES[active].spot;
 
   const onMove = (e: React.MouseEvent) => {
@@ -149,35 +160,61 @@ function ConsoleShot({ active }: { active: number }) {
 
   return (
     <div ref={ref} onMouseMove={onMove} onMouseLeave={reset} className="relative [perspective:1400px] lg:-my-10 lg:-mr-[3vw]">
-      <motion.div
-        initial={reduce ? false : { opacity: 0, y: 40, rotateX: 18 }}
-        whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative"
-      >
-        <motion.div style={reduce ? undefined : { rotateX, rotateY, transformStyle: "preserve-3d" }} className="relative">
-          {/* tinted stage the render's white backdrop multiplies into; it has to share the
-              render's transform group, a blend mode cannot see past a transformed parent */}
-          <div aria-hidden className="builder-stage absolute inset-[-4%] rounded-[48px]" />
+      <motion.div style={reduce ? undefined : { rotateX, rotateY, transformStyle: "preserve-3d" }} className="relative">
+        {/* the panel wipes open from its left edge */}
+        <motion.div
+          initial={reduce ? false : { clipPath: "polygon(0% 24.2%, 0% 24.2%, 0% 86.3%, 0% 86.3%)" }}
+          whileInView={{ clipPath: PANEL }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+          style={{ clipPath: PANEL }}
+          className="builder-panel relative"
+        >
           <img
             src="/generated/builder-console.webp"
             width={1960}
             height={1890}
-            alt="Tring Tring console: a node canvas with Start call, Greeting, a returning-caller condition, Look up order, Human handoff and End call nodes connected in a flow, with cues for drag and connect, test in real time and publish instantly"
-            className="console-shot themed-shot block h-auto w-full"
+            alt="Tring Tring console: a node canvas with Start call, Greeting, a returning-caller condition, Look up order, Human handoff and End call nodes connected in a flow"
+            className="builder-shot block h-auto w-full"
             loading="lazy"
           />
+          {!reduce && (
+            <>
+              <motion.div aria-hidden style={{ background: glare }} className="pointer-events-none absolute inset-0" />
+              <div aria-hidden className="builder-scan pointer-events-none absolute inset-0" />
+            </>
+          )}
           {/* the feature on the left, lit on the render */}
           <motion.span
             aria-hidden
-            className="hotspot pointer-events-none absolute rounded-[14px]"
+            className="hotspot pointer-events-none absolute rounded-[10px]"
             initial={false}
             animate={{ left: `${l}%`, top: `${t}%`, width: `${w}%`, height: `${h}%` }}
             transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 120, damping: 18 }}
           />
-          {!reduce && <motion.div aria-hidden style={{ background: glare }} className="pointer-events-none absolute inset-0 mix-blend-overlay" />}
         </motion.div>
+
+        {CUES.map((c, i) => (
+          <motion.span
+            key={c.text}
+            aria-hidden
+            className={`absolute hidden items-center gap-2 rounded-[10px] bg-ink px-3.5 py-2 text-sm font-medium text-white shadow-lift sm:inline-flex ${c.pos}`}
+            style={{ transform: "translateZ(40px)" }}
+            initial={reduce ? false : { opacity: 0, y: 16, scale: 0.9 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, delay: 0.9 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <motion.span
+              className="inline-flex items-center gap-2"
+              animate={reduce ? undefined : { y: [0, -5, 0] }}
+              transition={{ duration: 4 + i * 0.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
+            >
+              <c.icon size={15} weight="bold" />
+              {c.text}
+            </motion.span>
+          </motion.span>
+        ))}
       </motion.div>
     </div>
   );
